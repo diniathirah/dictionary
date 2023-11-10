@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>WORD OF THE DAY</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', serif;
+      background-color: #f5f0e1;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      background-color: #333;
+      color: white;
+      padding: 40px;
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 36px;
+      border-radius: 5px;
+    }
+    .mainWrapper {
+      padding: 20px;
+      margin: 20px;
+      background-color: #fff;
+      border: 1px solid #333;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin: 20px 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    input, textarea, button {
+      padding: 10px;
+      margin: 15px 0;
+      border: 1px solid #333;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    button {
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ff7272;
+    }
+  </style>
+</head>
+<body>
+  <h1>WORD OF THE DAY FILE☀️!</h1>
+  <div class="mainWrapper">
+    <form>
+      <div class="form-group">
+        <label>File name</label>
+        <input id="fileName" type="text" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Content</label>
+        <textarea id="fileContents" class="form-control" rows="5"></textarea>
+      </div>
+    </form>
+    <button id="btnCreate">Create</button>
+    <button id="btnRead">Read</button>
+    <button id="btnDelete">Delete</button>
+    <a href="index.html">
+        <button id="btnHome">Home</button>
+      </a>
+  </div>
+
+  <script>
+    const fs = require('fs');
+    const path = require('path');
+
+    var btnCreate = document.getElementById('btnCreate');
+    var btnRead = document.getElementById('btnRead');
+    var btnDelete = document.getElementById('btnDelete');
+    var fileName = document.getElementById('fileName');
+    var fileContents = document.getElementById('fileContents');
+
+    let pathName = path.join(__dirname, 'Files');
+
+    btnCreate.addEventListener('click', function() {
+      let file = path.join(pathName, fileName.value);
+      let contents = fileContents.value;
+      fs.writeFile(file, contents, function(err) {
+        if (err) {
+          return console.log(err);
+        }
+        var txtfile = document.getElementById("fileName").value;
+        alert(txtfile + " text file was created");
+        console.log("The file was created");
+      });
+    });
+
+    btnRead.addEventListener('click', function() {
+      let file = path.join(pathName, fileName.value);
+      fs.readFile(file, function(err, data) {
+        if (err) {
+          return console.log(err);
+        }
+        fileContents.value = data;
+        console.log("The file was read!");
+      });
+    });
+
+    btnDelete.addEventListener('click', function() {
+      let file = path.join(pathName, fileName.value);
+      fs.unlink(file, function(err) {
+        if (err) {
+          return console.log(err);
+        }
+        fileName.value = "";
+        fileContents.value = "";
+        console.log("The file was deleted!");
+      });
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>DICTIONARY</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', serif;
+      background-color: #f5f0e1;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      background-color: #333;
+      color: white;
+      padding: 40px;
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 36px;
+      border-radius: 5px;
+    }
+    h2 {
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      margin: 0;
+      border-radius: 5px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    a {
+      padding: 10px 15px;
+      background-color: #333;
+      color: white;
+      border: none;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    a:hover {
+      background-color: #ff7272;
+    }
+    input, button {
+      padding: 10px;
+      margin: 15px 0;
+      border: 1px solid #333;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    button {
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ff7a7a;
+    }
+    .container, #words, .word-item {
+      padding: 20px;
+      margin: 20px;
+      background-color: #fff;
+      border: 1px solid #333;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .word-item {
+      margin-bottom: 20px;
+    }
+    .word-buttons {
+      margin-top: 10px;
+    }
+    #updateModal {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f5f0e1;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    <span>📔 NOTES SECTION</span>
+    <div class="header-right">
+      <a href="index.html">HOME</a>
+      <a href="files.html">FILES</a>
+      <a href="feedback.html">FEEDBACK</a>
+    </div>
+  </h1>
+  <div class="container">
+    <div>
+      <h3>Add a new word to the list:</h3>
+      <input type="text" id="wordInput" placeholder="Enter a word...">
+      <input type="text" id="meaningInput" placeholder="Enter the meaning...">
+      <button onclick="createWord()">Create</button>
+    </div>
+    <h3>Notes of the year</h3>
+    <div id="words">
+      <!-- Words will be dynamically added here -->
+    </div>
+  </div>
+
+  <div id="updateModal">
+    <div>
+      <label for="newWord" style="display: block;">Enter the new word:</label>
+      <input type="text" id="newWord" placeholder="Enter a new word...">
+      <label for="newMeaning" style="display: block;">Enter the new meaning:</label>
+      <input type="text" id="newMeaning" placeholder="Enter the new meaning...">
+      <button onclick="saveUpdate()">Save</button>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+  
+
+  <script>
+    var words = JSON.parse(localStorage.getItem('words')) || [];
+    var selectedIndex;
+
+    function createWord() {
+      var word = document.getElementById('wordInput').value;
+      var meaning = document.getElementById('meaningInput').value;
+      words.push({ word: word, meaning: meaning });
+      localStorage.setItem('words', JSON.stringify(words));
+      document.getElementById('wordInput').value = '';
+      document.getElementById('meaningInput').value = '';
+      readWords();
+    }
+
+    function readWords() {
+      var wordsDiv = document.getElementById('words');
+      wordsDiv.innerHTML = '';
+      for (var i = 0; i < words.length; i++) {
+        wordsDiv.innerHTML += `<div class="word-item"><p>${words[i].word}: ${words[i].meaning}</p> <div class="word-buttons"><button onclick="updateWord(${i})">Edit</button> <button onclick="deleteWord(${i})">Delete</button></div></div>`;
+      }
+    }
+
+    function updateWord(index) {
+      selectedIndex = index;
+      document.getElementById('updateModal').style.display = 'block';
+      document.getElementById('newWord').value = words[selectedIndex].word;
+      document.getElementById('newMeaning').value = words[selectedIndex].meaning;
+    }
+
+    function closeModal() {
+      document.getElementById('updateModal').style.display = 'none';
+    }
+
+    function saveUpdate() {
+      var newWord = document.getElementById('newWord').value;
+      var newMeaning = document.getElementById('newMeaning').value;
+      words[selectedIndex] = { word: newWord, meaning: newMeaning };
+      localStorage.setItem('words', JSON.stringify(words));
+      readWords();
+      closeModal();
+    }
+
+    function deleteWord(index) {
+      words.splice(index, 1);
+      localStorage.setItem('words', JSON.stringify(words));
+      readWords();
+    }
+
+    // Load data from localStorage when the page is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      readWords();
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Feedback</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', serif;
+      background-color: #f5f0e1;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      background-color: #333;
+      color: white;
+      padding: 40px;
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 36px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    a {
+      padding: 10px 15px;
+      background-color: #333;
+      color: white;
+      border: none;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    a:hover {
+      background-color: #f76969;
+    }
+    .form-group {
+      margin: 20px 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    input, textarea, button {
+      padding: 10px;
+      margin: 15px 0;
+      border: 1px solid #333;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    button {
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ff5757;
+    }
+    .container, #feedbackList, .feedback-item {
+      padding: 20px;
+      margin: 20px;
+      background-color: #fff;
+      border: 1px solid #333;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .feedback-item {
+      margin-bottom: 20px;
+    }
+    .feedback-buttons {
+      margin-top: 10px;
+    }
+    #updateModal {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f5f0e1;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    📝FEEDBACK FOR DICTIONARY
+    <div class="header-right">
+      <a href="index.html">HOME</a>
+      <a href="word.html">NOTES</a>
+      <a href="files.html">FILES</a>
+    </div>
+  </h1>
+  <center>
+  <div class="container">
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" id="name" placeholder="Enter your name">
+    </div>
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="Enter your email">
+    </div>
+    <div class="form-group">
+      <label for="message">Message:</label>
+      <textarea id="message" placeholder="Enter your feedback"></textarea>
+    </div>
+    <button onclick="submitFeedback()">Submit</button>
+  </center>
+  
+    <div id="feedbackList"></div>
+  </div>
+
+  <div id="updateModal">
+    <div>
+      <label for="newName">Name:</label>
+      <input type="text" id="newName" placeholder="Enter a new name...">
+    </div>
+    <div>
+      <label for="newEmail">Email:</label>
+      <input type="email" id="newEmail" placeholder="Enter a new email...">
+    </div>
+    <div>
+      <label for="newMessage">Message:</label>
+      <textarea id="newMessage" placeholder="Enter a new message..."></textarea>
+    </div>
+    <button onclick="saveUpdate()">Save</button>
+    <button onclick="closeModal()">Close</button>
+  </div>
+
+  <script>
+    // Initialize the feedbacks array with data from localStorage
+    var feedbacks = JSON.parse(localStorage.getItem('feedbacks')) || [];
+    var selectedIndex;
+
+    function submitFeedback() {
+      var name = document.getElementById('name').value;
+      var email = document.getElementById('email').value;
+      var message = document.getElementById('message').value;
+      
+      feedbacks.push({
+        name: name,
+        email: email,
+        message: message
+      });
+
+      // Store the feedbacks array in localStorage
+      localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+      
+      readFeedbacks();
+    }
+
+    function readFeedbacks() {
+      var feedbackList = document.getElementById('feedbackList');
+      feedbackList.innerHTML = '';
+      for (var i = 0; i < feedbacks.length; i++) {
+        feedbackList.innerHTML += `
+          <div class="feedback-item">
+            <p>Name: ${feedbacks[i].name}</p>
+            <p>Email: ${feedbacks[i].email}</p>
+            <p>Message: ${feedbacks[i].message}</p>
+            <div class="feedback-buttons">
+              <button onclick="updateFeedback(${i})">Update</button>
+              <button onclick="deleteFeedback(${i})">Delete</button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function updateFeedback(index) {
+      selectedIndex = index;
+      document.getElementById('newName').value = feedbacks[index].name;
+      document.getElementById('newEmail').value = feedbacks[index].email;
+      document.getElementById('newMessage').value = feedbacks[index].message;
+      document.getElementById('updateModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('updateModal').style.display = 'none';
+    }
+
+    function saveUpdate() {
+      feedbacks[selectedIndex].name = document.getElementById('newName').value;
+      feedbacks[selectedIndex].email = document.getElementById('newEmail').value;
+      feedbacks[selectedIndex].message = document.getElementById('newMessage').value;
+      
+      // Store the feedbacks array in localStorage
+      localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+
+      readFeedbacks();
+      closeModal();
+    }
+
+    function deleteFeedback(index) {
+      feedbacks.splice(index, 1);
+
+      // Store the feedbacks array in localStorage
+      localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+
+      readFeedbacks();
+    }
+
+    // Load feedbacks from localStorage when the page loads
+    readFeedbacks();
+  </script>
+</body>
+</html>
+
